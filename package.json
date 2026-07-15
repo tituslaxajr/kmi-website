@@ -12,7 +12,8 @@
     "lint": "eslint . --ignore-pattern .next",
     "test": "npm run build && node --test tests/*.test.mjs",
     "env:check": "node --env-file-if-exists=.env.local scripts/check-env.mjs",
-    "supabase:verify": "node --env-file=.env.local scripts/verify-supabase.mjs"
+    "supabase:verify": "node --env-file=.env.local scripts/verify-supabase.mjs",
+    "production:verify": "node --env-file=.env.local scripts/verify-production.mjs"
   },
   "dependencies": {
     "@fontsource/dm-sans": "^5.2.8",
