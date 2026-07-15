@@ -10,7 +10,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --ignore-pattern .next",
-    "test": "npm run build && node --test tests/*.test.mjs"
+    "test": "npm run build && node --test tests/*.test.mjs",
+    "env:check": "node --env-file-if-exists=.env.local scripts/check-env.mjs"
   },
   "dependencies": {
     "@fontsource/dm-sans": "^5.2.8",

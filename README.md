@@ -24,6 +24,8 @@ The public website reads published records and retains the verified seed stories
    - the final Vercel URL followed by `/auth/callback`
 5. Run `npm install`, then `npm run dev`.
 
+Run `npm run env:check` before starting local development. It reports missing key names without printing any values.
+
 `KMI_LOCAL_EDITOR=true` is an optional localhost convenience only. Never enable it in Vercel.
 
 ## Vercel environment variables
@@ -40,3 +42,9 @@ Optional form endpoints can be added with `NEXT_PUBLIC_CONTACT_ENDPOINT` and `NE
 ## Publishing flow
 
 Authorized staff visit `/admin`, request a magic link, write or edit content, upload a feature image, and publish. Published content appears on the corresponding public route. The editor also creates downloadable square, story, and landscape social cards.
+
+## GitHub and Vercel
+
+Push this repository to an empty GitHub repository with `main` as the default branch. The included GitHub Actions workflow runs install, lint, build, and architecture tests for every pull request and push to `main`.
+
+Import the GitHub repository into Vercel as a Next.js project, add the required environment variables to Development, Preview, and Production, and deploy. Vercel's Git integration will then create preview deployments for branches and production deployments from `main`.
