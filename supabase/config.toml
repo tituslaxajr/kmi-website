@@ -9,10 +9,12 @@ major_version = 17
 
 [auth]
 enabled = true
-site_url = "https://kmi-website-nine.vercel.app"
+site_url = "https://www.kapatidministry.org"
 additional_redirect_urls = [
   "http://localhost:3000/auth/callback",
   "https://kmi-website-nine.vercel.app/auth/callback",
+  "https://www.kapatidministry.org/auth/callback",
+  "https://kapatidministry.org/auth/callback",
   "https://*.vercel.app/auth/callback",
 ]
 

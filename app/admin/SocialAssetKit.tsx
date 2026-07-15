@@ -19,7 +19,7 @@ const kindNames = {
   "active-need": "ACTIVE NEED",
 } as const;
 
-const productionSiteOrigin = "https://kmi-website-nine.vercel.app";
+const productionSiteOrigin = "https://www.kapatidministry.org";
 const subscribeSiteOrigin = () => () => undefined;
 const getBrowserSiteOrigin = () => window.location.origin;
 const getServerSiteOrigin = () => productionSiteOrigin;

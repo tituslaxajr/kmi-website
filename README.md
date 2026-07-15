@@ -21,7 +21,8 @@ The public website reads published records and retains the verified seed stories
 3. Copy `.env.example` to `.env.local` and fill in the five required Supabase/staff values.
 4. In Supabase Auth URL Configuration, add:
    - `http://localhost:3000/auth/callback`
-   - the final Vercel URL followed by `/auth/callback`
+   - `https://www.kapatidministry.org/auth/callback`
+   - `https://kapatidministry.org/auth/callback`
 5. Run `npm install`, then `npm run dev`.
 
 Run `npm run env:check` before starting local development. It reports missing key names without printing any values.

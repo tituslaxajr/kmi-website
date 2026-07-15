@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 
-const baseUrl = (process.env.KMI_PRODUCTION_URL || "https://kmi-website-nine.vercel.app").replace(/\/$/, "");
+const baseUrl = (process.env.KMI_PRODUCTION_URL || "https://www.kapatidministry.org").replace(/\/$/, "");
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 const serverSecret = process.env.SUPABASE_SERVICE_ROLE_KEY;
