@@ -1,0 +1,12 @@
+/node_modules
+/.next
+/.vercel
+/coverage
+/out
+/.env*
+!/.env.example
+npm-debug.log*
+yarn-error.log*
+.DS_Store
+*.pem
+next-env.d.ts
