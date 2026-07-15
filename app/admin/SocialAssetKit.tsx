@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import type { ContentDocument } from "../lib/content";
 
 type SocialFormat = { id: string; label: string; note: string; width: number; height: number };
@@ -18,6 +18,11 @@ const kindNames = {
   "partner-church": "PARTNER CHURCH",
   "active-need": "ACTIVE NEED",
 } as const;
+
+const productionSiteOrigin = "https://kmi-website-nine.vercel.app";
+const subscribeSiteOrigin = () => () => undefined;
+const getBrowserSiteOrigin = () => window.location.origin;
+const getServerSiteOrigin = () => productionSiteOrigin;
 
 function wrapText(context: CanvasRenderingContext2D, text: string, maxWidth: number) {
   const words = text.trim().split(/\s+/);
@@ -47,7 +52,7 @@ function fitLines(context: CanvasRenderingContext2D, text: string, maxWidth: num
   return { lines, size: size + 2 };
 }
 
-function createAsset(document: ContentDocument, format: SocialFormat) {
+function createAsset(document: ContentDocument, format: SocialFormat, domain: string) {
   const canvas = window.document.createElement("canvas");
   canvas.width = format.width;
   canvas.height = format.height;
@@ -112,7 +117,6 @@ function createAsset(document: ContentDocument, format: SocialFormat) {
   context.fillText("KAPATID MINISTRY", margin + 56, footerY);
   context.fillStyle = "rgba(255,255,255,.65)";
   context.font = `500 ${compact ? 20 : 23}px Arial, sans-serif`;
-  const domain = "kapatidministry.org";
   context.fillText(domain, canvas.width - margin - context.measureText(domain).width, footerY);
 
   canvas.toBlob((blob) => {
@@ -128,7 +132,9 @@ function createAsset(document: ContentDocument, format: SocialFormat) {
 
 export default function SocialAssetKit({ document }: { document: ContentDocument }) {
   const [message, setMessage] = useState("");
-  const caption = `${document.title}\n\n${document.summary}\n\nRead more: https://kapatidministry.org/${document.kind === "prayer-request" ? "prayer" : document.kind === "field-update" ? "field-updates" : document.kind === "active-need" ? "active-needs" : document.kind === "partner-church" ? "partner-churches" : "stories"}/${document.slug}`;
+  const siteOrigin = useSyncExternalStore(subscribeSiteOrigin, getBrowserSiteOrigin, getServerSiteOrigin);
+  const siteDomain = siteOrigin.replace(/^https?:\/\//, "");
+  const caption = `${document.title}\n\n${document.summary}\n\nRead more: ${siteOrigin}/${document.kind === "prayer-request" ? "prayer" : document.kind === "field-update" ? "field-updates" : document.kind === "active-need" ? "active-needs" : document.kind === "partner-church" ? "partner-churches" : "stories"}/${document.slug}`;
 
   async function copyCaption() {
     await navigator.clipboard.writeText(caption);
@@ -143,9 +149,9 @@ export default function SocialAssetKit({ document }: { document: ContentDocument
       </div>
       <p>Download branded artwork in the right size for each channel. The title and summary stay in sync with this published post.</p>
       {message && <p className="social-kit-message" role="status">{message}</p>}
-      <div className="social-kit-preview" aria-hidden="true"><span>{kindNames[document.kind]}</span><strong>{document.title}</strong><small>KAPATID MINISTRY · kapatidministry.org</small></div>
+      <div className="social-kit-preview" aria-hidden="true"><span>{kindNames[document.kind]}</span><strong>{document.title}</strong><small>KAPATID MINISTRY · {siteDomain}</small></div>
       <div className="social-format-grid">
-        {formats.map((format) => <button key={format.id} onClick={() => createAsset(document, format)}><strong>Download {format.label}</strong><span>{format.note}</span><small>{format.width} × {format.height} PNG</small></button>)}
+        {formats.map((format) => <button key={format.id} onClick={() => createAsset(document, format, siteDomain)}><strong>Download {format.label}</strong><span>{format.note}</span><small>{format.width} × {format.height} PNG</small></button>)}
       </div>
     </section>
   );

@@ -74,7 +74,7 @@ export default async function Home() {
           <div className="home-stats-grid">
             {stats.map((stat) => <div key={stat.label}><strong>{stat.value}</strong><span>{stat.label}</span></div>)}
           </div>
-          <p className="home-stats-note">Each number represents people served through local churches. <a href="/annual-report-2024.pdf" target="_blank" rel="noreferrer">Read the 2024 annual report <span aria-hidden="true">↗</span></a></p>
+          <p className="home-stats-note">Each number represents people served through local churches. <a href="https://2025.kapatidministry.org" target="_blank" rel="noreferrer">Read the 2024 annual report <span aria-hidden="true">↗</span></a></p>
         </div>
       </section>
 
