@@ -137,7 +137,7 @@ try {
   }
 
   console.log("Production verification passed:");
-  console.log("- database, private response inbox, and at least one giving method report ready");
+  console.log("- database and private contact, prayer, newsletter, and giving-response inbox report ready");
   console.log("- Supabase magic-link authentication creates a valid staff session");
   console.log("- the deployed staff desk accepts the approved KMI identity");
   console.log("- authenticated content publishing succeeds through the production API");

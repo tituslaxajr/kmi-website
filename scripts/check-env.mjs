@@ -15,8 +15,7 @@ if (missing.length) {
 
 const givingKeys = ["KMI_CARD_GIVING_URL", "KMI_BANK_GIVING_DETAILS", "KMI_GCASH_GIVING_DETAILS"];
 if (!givingKeys.some((key) => process.env[key]?.trim())) {
-  console.error(`Missing a verified giving method: configure at least one of ${givingKeys.join(", ")}.`);
-  process.exitCode = 1;
+  console.log("Giving ready: visitors will request verified instructions through the private staff inbox. No direct payment details are published.");
 } else {
-  console.log("Giving ready: at least one verified method is configured.");
+  console.log("Giving ready: at least one direct verified method is configured, with the private request form as fallback.");
 }

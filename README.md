@@ -39,7 +39,7 @@ Add these to Development, Preview, and Production:
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `KMI_STAFF_EMAILS`
 
-Configure at least one verified giving method with `KMI_CARD_GIVING_URL`, `KMI_BANK_GIVING_DETAILS`, or `KMI_GCASH_GIVING_DETAILS`. These values stay server-side and only configured methods appear publicly.
+Direct giving methods are optional. Configure verified details with `KMI_CARD_GIVING_URL`, `KMI_BANK_GIVING_DETAILS`, or `KMI_GCASH_GIVING_DETAILS`; these values stay server-side and only configured methods appear publicly. When none are configured, visitors use the private giving-response form to request current instructions, confirm a transfer, or request a receipt.
 
 ## Publishing flow
 
@@ -57,4 +57,4 @@ Before launch, run `npm run env:check`, `npm run supabase:verify`, and `npm run 
 
 Run all three launch gates in order with `npm run launch:verify`.
 
-`/api/health` is the deployment readiness endpoint. It returns success only when the content database, private supporter inbox, and at least one verified giving method are all available. It never returns credentials or giving details.
+`/api/health` is the deployment readiness endpoint. It returns success only when the content database and private supporter inbox—including the giving-response journey—are available. It never returns credentials or giving details.

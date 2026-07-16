@@ -85,7 +85,7 @@ test("readiness and recovery surfaces cover production dependencies", async () =
   const robots = await read("../app/robots.ts");
   assert.match(health, /contentDatabase/);
   assert.match(health, /responseInbox/);
-  assert.match(health, /givingMethod/);
+  assert.match(health, /givingResponse/);
   assert.match(errorPage, /Try again/);
   assert.match(notFound, /Page not found/);
   assert.match(robots, /disallow: \["\/admin", "\/api\/"\]/);
