@@ -21,7 +21,7 @@ function publishingError(document: { kind: ContentKind; summary: string; body: s
   if (document.kind === "story" && !document.programSlug) return "Choose a ministry program before publishing this story.";
   if (document.kind === "field-update" && (!document.churchSlug || !document.programSlug)) return "Choose the partner church and ministry program before publishing this field report.";
   if (document.kind === "prayer-request" && !String(document.metadata.focus || "").trim()) return "Add a one-line prayer focus before publishing.";
-  if (document.kind === "partner-church" && (!String(document.metadata.location || "").trim() || !Array.isArray(document.metadata.programSlugs))) return "Add the church location and at least one ministry program before publishing.";
+  if (document.kind === "partner-church" && (!String(document.metadata.location || "").trim() || !Array.isArray(document.metadata.programSlugs) || !document.metadata.programSlugs.length)) return "Add the church location and at least one ministry program before publishing.";
   if (document.kind === "active-need") {
     if (!document.churchSlug || !document.programSlug) return "Choose the partner church and ministry program before publishing this need.";
     if (Number(document.metadata.target || 0) <= 0 || !String(document.metadata.deadline || "").trim()) return "Add a positive target amount and target date before publishing this need.";

@@ -27,8 +27,10 @@ export async function POST(request: Request) {
   }
 
   const origin = request.headers.get("origin");
-  if (origin && new URL(origin).host.toLowerCase() !== requestHost(request)) {
-    return Response.json({ error: "This form can only be submitted from the Kapatid Ministry website." }, { status: 403 });
+  if (origin) {
+    try {
+      if (new URL(origin).host.toLowerCase() !== requestHost(request)) return Response.json({ error: "This form can only be submitted from the Kapatid Ministry website." }, { status: 403 });
+    } catch { return Response.json({ error: "This form can only be submitted from the Kapatid Ministry website." }, { status: 403 }); }
   }
 
   let payload: Record<string, unknown>;

@@ -58,6 +58,7 @@ test("public response journeys use a private staff inbox", async () => {
   assert.match(forms, /\/api\/engagement/);
   assert.match(forms, /PrayerResponseForm/);
   assert.match(forms, /GivingResponseForm/);
+  assert.match(forms, /const form = event\.currentTarget/);
   assert.match(publicRoute, /requestHost\(request\)/);
   assert.match(publicRoute, /client_hash/);
   assert.match(publicRoute, /Too many responses/);
@@ -96,4 +97,5 @@ test("production responses include baseline security headers", async () => {
   assert.match(config, /Referrer-Policy/);
   assert.match(config, /Permissions-Policy/);
   assert.match(config, /X-Frame-Options/);
+  assert.match(config, /Strict-Transport-Security/);
 });

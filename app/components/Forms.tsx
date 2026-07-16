@@ -27,10 +27,11 @@ export function NewsletterForm() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const form = event.currentTarget;
     setState("sending");
     try {
-      setMessage(await sendForm(event.currentTarget, "newsletter"));
-      event.currentTarget.reset();
+      setMessage(await sendForm(form, "newsletter"));
+      form.reset();
       setState("success");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Your email could not be saved.");
@@ -57,10 +58,11 @@ export function ContactForm() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const form = event.currentTarget;
     setState("sending");
     try {
-      setMessage(await sendForm(event.currentTarget, "contact"));
-      event.currentTarget.reset();
+      setMessage(await sendForm(form, "contact"));
+      form.reset();
       setState("success");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Your message could not be delivered.");
@@ -99,10 +101,11 @@ export function PrayerResponseForm({ prayerSlug, prayerTitle }: { prayerSlug: st
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const form = event.currentTarget;
     setState("sending");
     try {
-      setMessage(await sendForm(event.currentTarget, "prayer", { prayerSlug, interest: prayerTitle }));
-      event.currentTarget.reset();
+      setMessage(await sendForm(form, "prayer", { prayerSlug, interest: prayerTitle }));
+      form.reset();
       setState("success");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Your prayer response could not be delivered.");
