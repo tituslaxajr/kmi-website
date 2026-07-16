@@ -36,3 +36,66 @@ test("admin mutations require an approved Supabase user", async () => {
   assert.match(auth, /KMI_STAFF_EMAILS/);
   assert.match(route, /getKMIStaff\(\)/);
 });
+
+test("admin keeps editorial content separate from structured ministry records", async () => {
+  const desk = await read("../app/admin/AdminDesk.tsx");
+  const content = await read("../app/lib/content.ts");
+  assert.match(desk, /editorialKinds = new Set<ContentKind>\(\["story", "prayer-request", "field-update"\]\)/);
+  assert.match(desk, /Church profile information/);
+  assert.match(desk, /Need information/);
+  assert.match(desk, /nextMilestone/);
+  assert.match(desk, /activeIsEditorial && <SocialAssetKit/);
+  assert.match(content, /metadata\.programSlugs/);
+  assert.match(content, /churchName:/);
+});
+
+test("public response journeys use a private staff inbox", async () => {
+  const forms = await read("../app/components/Forms.tsx");
+  const publicRoute = await read("../app/api/engagement/route.ts");
+  const adminRoute = await read("../app/api/admin/engagement/route.ts");
+  const migration = await read("../supabase/migrations/20260716000100_engagement_submissions.sql");
+  const givingPage = await read("../app/give/page.tsx");
+  assert.match(forms, /\/api\/engagement/);
+  assert.match(forms, /PrayerResponseForm/);
+  assert.match(forms, /GivingResponseForm/);
+  assert.match(forms, /const form = event\.currentTarget/);
+  assert.match(publicRoute, /requestHost\(request\)/);
+  assert.match(publicRoute, /client_hash/);
+  assert.match(publicRoute, /Too many responses/);
+  assert.match(publicRoute, /getSupabaseAdminClient/);
+  assert.match(adminRoute, /getKMIStaff\(\)/);
+  assert.match(migration, /revoke all on public\.engagement_submissions from anon, authenticated/i);
+  assert.match(givingPage, /getPublishedNeeds\(\)/);
+  assert.doesNotMatch(givingPage, /Sample amounts|Draft designation|Pending verification/);
+});
+
+test("staff magic links are issued only through the server allowlist", async () => {
+  const login = await read("../app/admin/login/LoginForm.tsx");
+  const route = await read("../app/api/auth/magic-link/route.ts");
+  assert.match(login, /\/api\/auth\/magic-link/);
+  assert.doesNotMatch(login, /signInWithOtp/);
+  assert.match(route, /isKMIStaffEmail/);
+  assert.match(route, /signInWithOtp/);
+});
+
+test("readiness and recovery surfaces cover production dependencies", async () => {
+  const health = await read("../app/api/health/route.ts");
+  const errorPage = await read("../app/error.tsx");
+  const notFound = await read("../app/not-found.tsx");
+  const robots = await read("../app/robots.ts");
+  assert.match(health, /contentDatabase/);
+  assert.match(health, /responseInbox/);
+  assert.match(health, /givingResponse/);
+  assert.match(errorPage, /Try again/);
+  assert.match(notFound, /Page not found/);
+  assert.match(robots, /disallow: \["\/admin", "\/api\/"\]/);
+});
+
+test("production responses include baseline security headers", async () => {
+  const config = await read("../next.config.ts");
+  assert.match(config, /X-Content-Type-Options/);
+  assert.match(config, /Referrer-Policy/);
+  assert.match(config, /Permissions-Policy/);
+  assert.match(config, /X-Frame-Options/);
+  assert.match(config, /Strict-Transport-Security/);
+});

@@ -32,9 +32,11 @@ const adminClient = createClient(
 const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 const managedSlug = `verification-${suffix}`;
 const deniedSlug = `anonymous-write-${suffix}`;
+const engagementEmail = `verification-${suffix}@example.com`;
 
 async function removeVerificationRows() {
   await adminClient.from("content_documents").delete().in("slug", [managedSlug, deniedSlug]);
+  await adminClient.from("engagement_submissions").delete().eq("email", engagementEmail);
 }
 
 try {
@@ -92,12 +94,20 @@ try {
     throw new Error("published content is not visible to anonymous readers");
   }
 
+  const { error: engagementInsertError } = await adminClient.from("engagement_submissions").insert({
+    kind: "contact", email: engagementEmail, name: "Deployment verifier", message: "Temporary private inbox verification.",
+  });
+  if (engagementInsertError) throw engagementInsertError;
+  const { error: privateInboxError } = await publicClient.from("engagement_submissions").select("id").eq("email", engagementEmail);
+  if (!privateInboxError) throw new Error("private engagement inbox is queryable with the public key");
+
   console.log("Supabase verification passed:");
   console.log("- content-media bucket is public with the expected size and MIME limits");
   console.log("- anonymous writes are denied");
   console.log("- draft documents are private");
   console.log("- trusted server writes succeed");
   console.log("- published documents are publicly readable");
+  console.log("- supporter responses are private to the trusted server role");
 } finally {
   await removeVerificationRows();
 }

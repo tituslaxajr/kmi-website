@@ -13,7 +13,8 @@
     "test": "npm run build && node --test tests/*.test.mjs",
     "env:check": "node --env-file-if-exists=.env.local scripts/check-env.mjs",
     "supabase:verify": "node --env-file=.env.local scripts/verify-supabase.mjs",
-    "production:verify": "node --env-file=.env.local scripts/verify-production.mjs"
+    "production:verify": "node --env-file=.env.local scripts/verify-production.mjs",
+    "launch:verify": "npm run env:check && npm run supabase:verify && npm run production:verify"
   },
   "dependencies": {
     "@fontsource/dm-sans": "^5.2.8",
