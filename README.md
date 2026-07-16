@@ -11,13 +11,14 @@ This is the native Next.js deployment of the Kapatid Ministry public website and
 - **Content:** Supabase Postgres
 - **Images:** public `content-media` bucket in Supabase Storage
 - **Authorization:** server-side `KMI_STAFF_EMAILS` allowlist; the Supabase service-role key never reaches the browser
+- **Supporter responses:** private Supabase inbox for contact, newsletter, prayer, and giving responses
 
 The public website reads published records and retains the verified seed stories and prayer content when Supabase is unavailable. `/admin` requires both a valid Supabase session and an approved email.
 
 ## Local setup
 
 1. Create a Supabase project.
-2. Run `supabase/migrations/20260715000100_kmi_content.sql` in the Supabase SQL Editor, or apply it with the Supabase CLI.
+2. Run both SQL files in `supabase/migrations` in filename order, or apply them with the Supabase CLI.
 3. Copy `.env.example` to `.env.local` and fill in the five required Supabase/staff values.
 4. In Supabase Auth URL Configuration, add:
    - `http://localhost:3000/auth/callback`
@@ -38,14 +39,22 @@ Add these to Development, Preview, and Production:
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `KMI_STAFF_EMAILS`
 
-Optional form endpoints can be added with `NEXT_PUBLIC_CONTACT_ENDPOINT` and `NEXT_PUBLIC_NEWSLETTER_ENDPOINT`.
+Configure at least one verified giving method with `KMI_CARD_GIVING_URL`, `KMI_BANK_GIVING_DETAILS`, or `KMI_GCASH_GIVING_DETAILS`. These values stay server-side and only configured methods appear publicly.
 
 ## Publishing flow
 
 Authorized staff visit `/admin`, request a magic link, write or edit content, upload a feature image, and publish. Published content appears on the corresponding public route. The editor also creates downloadable square, story, and landscape social cards.
+
+Contact messages, prayer responses, newsletter signups, and giving questions are delivered to the private staff inbox at `/admin/responses`. Public Supabase credentials cannot query that table.
 
 ## GitHub and Vercel
 
 Push this repository to an empty GitHub repository with `main` as the default branch. The included GitHub Actions workflow runs install, lint, build, and architecture tests for every pull request and push to `main`.
 
 Import the GitHub repository into Vercel as a Next.js project, add the required environment variables to Development, Preview, and Production, and deploy. Vercel's Git integration will then create preview deployments for branches and production deployments from `main`.
+
+Before launch, run `npm run env:check`, `npm run supabase:verify`, and `npm run production:verify`. The production verifier signs in as approved staff, publishes and removes a temporary update, submits and removes a temporary public response, and checks both public rendering and the private staff inbox.
+
+Run all three launch gates in order with `npm run launch:verify`.
+
+`/api/health` is the deployment readiness endpoint. It returns success only when the content database, private supporter inbox, and at least one verified giving method are all available. It never returns credentials or giving details.

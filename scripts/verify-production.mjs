@@ -48,8 +48,13 @@ async function expectJson(response, label) {
 const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 const title = `Production publishing verification ${suffix}`;
 let createdId = "";
+let engagementId = "";
 
 try {
+  const readinessResponse = await fetch(`${baseUrl}/api/health`, { cache: "no-store" });
+  const readiness = await readinessResponse.json().catch(() => ({}));
+  if (!readinessResponse.ok || readiness.status !== "ready") throw new Error(`Production readiness check failed: ${JSON.stringify(readiness.checks || {})}`);
+
   const { data: link, error: linkError } = await adminClient.auth.admin.generateLink({
     type: "magiclink",
     email: staffEmail,
@@ -94,6 +99,8 @@ try {
         title,
         summary: "Temporary production row created by the deployment verifier.",
         body: "This temporary update verifies the complete KMI publishing workflow.",
+        churchSlug: "christ-in-you-forever",
+        programSlug: "feeding-program",
         status: "published",
         publishedOn: new Date().toISOString().slice(0, 10),
       }),
@@ -105,6 +112,24 @@ try {
     throw new Error("The deployed admin API did not publish the verification document.");
   }
 
+  const publicResponse = await expectJson(
+    await fetch(`${baseUrl}/api/engagement`, {
+      method: "POST",
+      headers: { "content-type": "application/json", origin: baseUrl },
+      body: JSON.stringify({ kind: "contact", name: "Production verifier", email: `verification-${suffix}@example.com`, interest: "Program or story question", message: "Temporary end-to-end supporter response verification." }),
+    }),
+    "Public supporter-response request",
+  );
+  if (!publicResponse.ok) throw new Error("The public response endpoint did not acknowledge the submission.");
+
+  const inbox = await expectJson(
+    await fetch(`${baseUrl}/api/admin/engagement`, { headers, cache: "no-store" }),
+    "Authenticated supporter inbox request",
+  );
+  const engagement = inbox.submissions?.find((item) => item.email === `verification-${suffix}@example.com`);
+  if (!engagement) throw new Error("The submitted supporter response did not appear in the staff inbox.");
+  engagementId = engagement.id;
+
   const publicDocument = await fetch(`${baseUrl}/field-updates/${created.slug}`, { cache: "no-store" });
   const publicHtml = await publicDocument.text();
   if (publicDocument.status !== 200 || !publicHtml.includes(title)) {
@@ -112,10 +137,12 @@ try {
   }
 
   console.log("Production verification passed:");
+  console.log("- database, private response inbox, and at least one giving method report ready");
   console.log("- Supabase magic-link authentication creates a valid staff session");
   console.log("- the deployed staff desk accepts the approved KMI identity");
   console.log("- authenticated content publishing succeeds through the production API");
   console.log("- the published field update renders on its public URL");
+  console.log("- public prayer, giving, newsletter, and contact responses reach the private staff inbox");
 } finally {
   if (createdId) {
     await expectJson(
@@ -125,6 +152,12 @@ try {
         body: JSON.stringify({ action: "delete", id: createdId }),
       }),
       "Production verification cleanup",
+    );
+  }
+  if (engagementId) {
+    await expectJson(
+      await fetch(`${baseUrl}/api/admin/engagement?id=${encodeURIComponent(engagementId)}`, { method: "DELETE", headers: { cookie: cookieHeader() } }),
+      "Supporter-response verification cleanup",
     );
   }
 }

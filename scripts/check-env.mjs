@@ -12,3 +12,11 @@ if (missing.length) {
 } else {
   console.log(`Environment ready: ${required.length} required variables are present.`);
 }
+
+const givingKeys = ["KMI_CARD_GIVING_URL", "KMI_BANK_GIVING_DETAILS", "KMI_GCASH_GIVING_DETAILS"];
+if (!givingKeys.some((key) => process.env[key]?.trim())) {
+  console.error(`Missing a verified giving method: configure at least one of ${givingKeys.join(", ")}.`);
+  process.exitCode = 1;
+} else {
+  console.log("Giving ready: at least one verified method is configured.");
+}

@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "../../components/SiteChrome";
+import { PrayerResponseForm } from "../../components/Forms";
 import { prayerRequests as seedPrayers, formatDate } from "../../lib/data";
 import { getPublishedPrayerRequests } from "../../lib/content";
 
@@ -27,6 +28,7 @@ export default async function PrayerDetailPage({ params }: { params: Promise<{ s
         <figure className="article-image"><Image unoptimized src={prayer.image} alt={prayer.alt} width={1024} height={683} sizes="(max-width: 1000px) 100vw, 980px" /></figure>
         <aside className="prayer-callout"><p className="eyebrow">Pray for</p><h2>{prayer.focus}</h2></aside>
         <div className="article-body">{prayer.body.map((paragraph, index) => paragraph.startsWith("- ") ? <ul key={index}>{paragraph.split("\n").map((line) => <li key={line}>{line.replace(/^- /, "")}</li>)}</ul> : <p key={index}>{paragraph}</p>)}</div>
+        <PrayerResponseForm prayerSlug={prayer.slug} prayerTitle={prayer.title} />
       </article>
       <section className="article-cta"><div className="shell narrow"><p className="eyebrow light">Keep praying</p><h2>Receive the next focus and field update.</h2><div className="button-row"><Link className="button button-light" href="/prayer">More prayer requests</Link><Link className="button button-ghost-light" href="/field-updates">Field updates</Link></div></div></section>
     </>

@@ -40,7 +40,7 @@ export function StatusBadge({ status }: { status: Need["status"] }) {
 export function NeedCard({ need, compact = false }: { need: Need; compact?: boolean }) {
   const church = getChurch(need.churchSlug);
   const program = getProgram(need.programSlug);
-  const percentage = Math.min(100, Math.round((need.received / need.target) * 100));
+  const percentage = need.target > 0 ? Math.min(100, Math.round((need.received / need.target) * 100)) : 0;
   const canGive = need.status === "active" || need.status === "closing";
 
   return (
@@ -50,7 +50,7 @@ export function NeedCard({ need, compact = false }: { need: Need; compact?: bool
         <span className="card-kicker">{program?.shortTitle}</span>
       </div>
       <h3><Link href={`/active-needs/${need.slug}`}>{need.title}</Link></h3>
-      <p className="church-line">Led on the ground by <Link href={`/partner-churches/${church?.slug}`}>{church?.name}</Link></p>
+      <p className="church-line">Led on the ground by <Link href={`/partner-churches/${need.churchSlug}`}>{need.churchName || church?.name || "a KMI partner church"}</Link></p>
       {!compact && <p>{need.summary}</p>}
       <div className="funding-row">
         <strong>{formatPeso(need.received)}</strong>
@@ -80,7 +80,7 @@ export function UpdateCard({ update }: { update: FieldUpdate }) {
       <div className="card-body">
         <div className="card-meta"><span>{program?.shortTitle}</span><time dateTime={update.date}>{formatDate(update.date)}</time></div>
         <h3><Link href={`/field-updates/${update.slug}`}>{update.title}</Link></h3>
-        <p className="church-line">Update from {church?.name}</p>
+        <p className="church-line">Report from {update.churchName || church?.name || "a KMI partner church"}</p>
         <p>{update.summary}</p>
         <Link className="arrow-link" href={`/field-updates/${update.slug}`}>Read the verified update <span aria-hidden="true">→</span></Link>
       </div>

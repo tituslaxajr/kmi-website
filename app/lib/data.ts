@@ -40,6 +40,8 @@ export type Need = {
   prayer: string;
   nextMilestone: string;
   transitionGoal: string;
+  churchName?: string;
+  churchLocation?: string;
   sample?: boolean;
 };
 
@@ -57,6 +59,7 @@ export type FieldUpdate = {
   next: string;
   image: string;
   alt: string;
+  churchName?: string;
 };
 
 export type PrayerRequest = {

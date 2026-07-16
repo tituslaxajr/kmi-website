@@ -17,7 +17,7 @@ export type ContentDocument = {
   churchSlug: string;
   programSlug: string;
   publishedOn: string;
-  metadata: Record<string, string | number | boolean>;
+  metadata: Record<string, string | number | boolean | string[]>;
   authorEmail: string;
   createdAt: string;
   updatedAt: string;
@@ -77,7 +77,10 @@ export async function getPublishedStories() {
 
 export async function getPublishedUpdates() {
   try {
-    const documents = await listDocuments({ kind: "field-update", publishedOnly: true });
+    const [documents, churches] = await Promise.all([
+      listDocuments({ kind: "field-update", publishedOnly: true }),
+      getPublishedChurches(),
+    ]);
     return documents.map((document) => ({
       slug: document.slug, title: document.title, churchSlug: document.churchSlug || "christ-in-you-forever",
       programSlug: document.programSlug || "feeding-program", date: document.publishedOn || document.publishedAt?.slice(0, 10) || new Date().toISOString().slice(0, 10),
@@ -86,6 +89,7 @@ export async function getPublishedUpdates() {
       prayer: String(document.metadata.prayer || "Pray for the church, its volunteers, and the families they continue to serve."),
       next: String(document.metadata.next || "The next field update will share what follows."), image: document.image || "/church-partners.jpg",
       alt: document.imageAlt || "A Kapatid Ministry partner church field update",
+      churchName: churches.find((church) => church.slug === document.churchSlug)?.name,
     }));
   } catch { return []; }
 }
@@ -111,9 +115,12 @@ export async function getPublishedChurches() {
     const documents = await listDocuments({ kind: "partner-church", publishedOnly: true });
     const managed = documents.map((document) => ({
       slug: document.slug, name: document.title, location: String(document.metadata.location || "Philippines"),
-      summary: document.summary || document.body, programs: document.programSlug ? [document.programSlug] : [],
+      summary: document.summary || document.body,
+      programs: Array.isArray(document.metadata.programSlugs)
+        ? document.metadata.programSlugs.map(String)
+        : document.programSlug ? [document.programSlug] : [],
       prayer: String(document.metadata.prayer || "Pray for this church and the community it serves."),
-      verified: "Profile maintained by the KMI team", image: document.image || "/church-partners.jpg",
+      verified: String(document.metadata.profileStatus || "Profile maintained by the KMI team"), image: document.image || "/church-partners.jpg",
       alt: document.imageAlt || `${document.title} partner church`,
     }));
     return [...managed, ...churches.filter((seed) => !managed.some((item) => item.slug === seed.slug))];
@@ -122,7 +129,10 @@ export async function getPublishedChurches() {
 
 export async function getPublishedNeeds() {
   try {
-    const documents = await listDocuments({ kind: "active-need", publishedOnly: true });
+    const [documents, churches] = await Promise.all([
+      listDocuments({ kind: "active-need", publishedOnly: true }),
+      getPublishedChurches(),
+    ]);
     return documents.map((document) => ({
       slug: document.slug, title: document.title, churchSlug: document.churchSlug || "christ-in-you-forever",
       programSlug: document.programSlug || "feeding-program", status: String(document.metadata.needStatus || "active") as "active" | "closing" | "completed" | "fully-funded",
@@ -131,7 +141,10 @@ export async function getPublishedNeeds() {
       designation: String(document.metadata.designation || document.title.toUpperCase()), verifiedAt: document.updatedAt.slice(0, 10), summary: document.summary,
       prayer: String(document.metadata.prayer || "Pray for the church and the people connected to this need."),
       nextMilestone: String(document.metadata.nextMilestone || "The church will confirm the next milestone in its field update."),
-      transitionGoal: String(document.metadata.transitionGoal || "Complete the work and share what follows."), sample: false,
+      transitionGoal: String(document.metadata.transitionGoal || "Complete the work and share what follows."),
+      churchName: churches.find((church) => church.slug === document.churchSlug)?.name,
+      churchLocation: churches.find((church) => church.slug === document.churchSlug)?.location,
+      sample: false,
     }));
   } catch { return []; }
 }
